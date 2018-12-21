@@ -1,5 +1,4 @@
 window.onload = function () {
-    // let time = new Date()
     const canvas = document.getElementById('myCanvas')
     const ctx = canvas.getContext("2d")
 
@@ -16,16 +15,18 @@ window.onload = function () {
             return new Date(date).toISOString()
         }
     }
+
     let stopGame = true
-    //Pedro
     let text = "PLAYER 2"
     let score1 = 0
-    let lives1 = 3
 
 
-
-    let background = new Image()
-    background.src = "images/bg8.jpg"
+    let background1 = new Image()
+    background1.src = "images/bg6.jpg"
+    let background2 = new Image()
+    background2.src = "images/bg8.jpg"
+    let background3 = new Image()
+    background3.src = "images/bg5.jpg"
 
 
     let mortyHead = new Image()
@@ -38,6 +39,7 @@ window.onload = function () {
     mees.src = "images/mees.png"
     //let pattern=ctx.createPattern(mees,"no-repeat");
 
+    let level = 1
 
     let MortyScaledWidth = 90
     let MortyScaledHeight = 80
@@ -67,7 +69,6 @@ window.onload = function () {
             this.height = 35
         }
         show() {
-
             ctx.drawImage(plat, this.x, this.y, this.length, this.height)
         }
     }
@@ -82,18 +83,6 @@ window.onload = function () {
         }
 
         show() {
-            /* ctx.strokeStyle = this.color
-             ctx.lineWidth = 1
-             ctx.beginPath()
-             ctx.moveTo(this.x, this.y)
-             ctx.lineTo(this.x, this.y - this.height)
-             ctx.stroke()
- 
-             ctx.beginPath()
-             ctx.moveTo(this.x + this.width, this.y)
-             ctx.lineTo(this.x + this.width, this.y - this.height)
-             ctx.stroke()*/
-
             ctx.drawImage(ladder, this.x, this.y - this.height, this.width, this.height)
         }
     }
@@ -134,8 +123,6 @@ window.onload = function () {
 
 
         show() {
-            // ctx.fillStyle = 'red'
-            // ctx.fillRect(this.x, this.y, this.fat, this.altura)
             ctx.drawImage(img, MortyWidth * countFrame, row * MortyHeight, MortyWidth, MortyHeight, devil.x, this.y - 28, MortyScaledWidth, MortyScaledHeight)
         }
 
@@ -193,15 +180,10 @@ window.onload = function () {
             this.morty.altura = this.y - this.altura + 25
             this.morty.pes = this.y + this.altura
 
-            //centro 
             this.centro.x = this.x + this.fat + 29
             this.centro.y = this.y
-            // drawLine(this.morty.pes, false)
+
             for (let i = 0; i < bolas.length; i++) {
-                // drawLine(bolas[0].y + 20, false)
-                // drawLine(bolas[0].x + 20, true)
-                // drawLine(bolas[0].x - 20, true)
-                // drawLine(bolas[0].y - 20, false)
 
                 if (bolas[i].x + bolas[i].raio >= this.morty.left && bolas[i].y + bolas[i].raio >= this.morty.altura &&
                     bolas[i].y + bolas[i].raio <= this.morty.pes && bolas[i].x + bolas[i].raio <= this.morty.right
@@ -210,15 +192,15 @@ window.onload = function () {
                     &&
                     bolas[i].y + bolas[i].raio <= this.morty.pes
                     && bolas[i].x - bolas[i].raio <= this.morty.right) {
-                    console.log('acertou')
+                    this.x = 300
+                    this.y = 450
                     stopGame = true
                     return true
                 }
 
             }
+
             return false
-            // return this.lives == 0 ? true : false 
-            // CTL ZZZZZZZZZZZZZZZZZZZZZ
         }
 
         up(vel) {
@@ -255,7 +237,11 @@ window.onload = function () {
         grav() {
             noGrav = true
 
-            //console.log(noGrav)
+
+            if (this.morty.pes <= 250 && this.aSubir == false) {
+                noGrav = false
+            }
+
             if (noGrav == true) {
                 if (this.y < 450 && this.aSubir == false) {
                     this.vY += this.gravidade
@@ -264,10 +250,6 @@ window.onload = function () {
                 }
             }
 
-            if (this.morty.pes <= 250 && this.aSubir == false) {
-                noGrav = false
-                this.y = 450
-            }
 
         }
     }
@@ -293,10 +275,9 @@ window.onload = function () {
         }
         show() {
 
-
             ctx.fillStyle = ctx.createPattern(space, "repeat")
             ctx.strokeStyle = "black"
-            ctx.lineWidth = "4"
+            ctx.lineWidth = "1"
             ctx.save()
             ctx.beginPath()
             ctx.arc(this.x, this.y, this.raio, 0, 2 * Math.PI)
@@ -327,7 +308,6 @@ window.onload = function () {
 
                 if (this.vx <= -1 && this.lado == -1) this.vx += 0.2
             }
-            console.log(this.velynovabola)
             this.vy += this.acel
             this.x += this.vx
             this.y += this.vy
@@ -342,11 +322,9 @@ window.onload = function () {
         colide() {
             for (let seta of setas) {
                 if (seta.x >= this.x - this.raio && seta.x <= this.x + this.raio) {
-                    // console.log('tá quase')
                     if (this.y - this.raio >= seta.y && this.y + this.raio <= devil.y) {
 
                         //Ao entrar aqui é porque a bola tocou em alguma parte da linha
-                        // console.log('morreu')
                         let diengBallx = 0, diengBally = 0
                         bolas = bolas.filter(bola => {
 
@@ -365,7 +343,6 @@ window.onload = function () {
                         setas.splice(setas.findIndex((xibanga) => xibanga.id == seta.id), 1)
                         if (this.raio == 30) {
                             // let lado = 0
-                            // if(vy)
                             bolas.push(new Bola(diengBallx, diengBally, this.raio / 2, 1, true))
                             bolas.push(new Bola(diengBallx, diengBally, this.raio / 2, -1, true))
                         }
@@ -382,12 +359,6 @@ window.onload = function () {
     //Onde a magia começa
     window.requestAnimationFrame(draw)
 
-    //Pedro
-    //O que faz a magia continuar
-    // for (let i = 0; i < 10; i++) {
-    //     bolas.push(new Bola())
-    // }
-
     let keyboardState = {
         left: false,
         right: false,
@@ -403,12 +374,9 @@ window.onload = function () {
         }
         else if (evt.keyCode == 38) {
             keyboardState.up = true
-            // devil.aSubir = true
-            // console.log('ata')
         }
         else if (evt.keyCode == 40) {
             keyboardState.down = true
-            // devil.down()
         }
         //Lançar Lança
         if (event.key == ' ') {
@@ -432,39 +400,89 @@ window.onload = function () {
         }
         else if (evt.keyCode == 40) {
             keyboardState.down = false
-            // console.log('É PARA DESCER')
-            // devil.down()
         }
     }
     document.addEventListener('keyup', onKeyUp, false)
     //------------------------------------------------------------------
     let consoles = false
     let nivelPassado = false
-    let reset = true
+
     //O que faz a magia continuar
-
-
-    let inserirVidas = true
     function draw() {
+        //Os niveis vão para aqui
 
-        ctx.fillStyle = 'black'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-        ctx.drawImage(background, 0, 0, background.width, background.height, 0, 0, canvas.width, 500)
+        if (level == 1) nivel1()
+        else if (level == 2) nivel2()
 
-        platform.show()
-        escada.show()
+        //-------------------------
 
+        if (devil.morreu()) {
+            // reset = true //Vai levar mais merdas, porque temos que dar a hipotese de tentar outra vez sem dar refresh
+            level = 1
+        }
 
         vidas()
 
-        //Desenhar o Chão
-        // floorLine()
-        // sky()
+
+
+        if (nivelPassado == true) {
+            console.log('Passas te de nivel')
+            nivelPassado = false
+            if (level < 4) level++
+            console.log('Nivel - ' + level)
+            for (let i = 0; i < 1; i++) {
+                bolas.push(new Bola())
+            }
+        }
 
         ctx.fillStyle = 'white'
         ctx.font = "20px Arial";
         ctx.fillText(text, 20, 525)
         ctx.fillText(score1, 55, 590)
+
+        //O que faz a magia repetir se
+        if (!stopGame) {
+            window.requestAnimationFrame(draw)
+        }
+        else {
+            while (bolas.length != 0) {
+                bolas.pop()
+            }
+            while (setas.length != 0) {
+                setas.pop()
+            }
+
+            console.log('Vidas - ' + devil.lives)
+            if (devil.lives > 0) {
+                devil.lives--
+                window.requestAnimationFrame(draw)
+            }
+            else { //Morte do Morty
+                devil.vy = -3
+                if (devil.y < 500) {
+                    devil.vy += 0.5
+                    devil.y -= devil.vy
+                }
+            }
+
+            for (let i = 0; i < 1; i++) {
+                bolas.push(new Bola())
+            }
+            stopGame = false
+        }
+
+        nivelPassado = false
+
+        if (bolas.length == 0) {
+            console.log('ata')
+            nivelPassado = true
+        }
+    }
+
+    function nivel1() {
+        ctx.fillStyle = 'black'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.drawImage(background1, 0, 0, background1.width, background1.height, 0, 0, canvas.width, 500)
 
         for (let i = 0; i < setas.length; i++) {
             setas[i].draw()
@@ -481,45 +499,39 @@ window.onload = function () {
             bola.update()
             bola.colide()
         }
-
-        if (devil.morreu()) reset = true
-
-        if (bolas.length == 0 && nivelPassado == false) {
-            console.log('Passas te de nivel')
-            nivelPassado = true
-        }
-        //O que faz a magia repetir se
-        if (!stopGame) window.requestAnimationFrame(draw)
-        else {
-            // console.log('perdeste')
-            // time.sleep(1000)
-            while (bolas.length != 0) {
-                bolas.pop()
-            }
-
-            if (devil.lives > 1) {
-                devil.lives--
-                window.requestAnimationFrame(draw)
-            }
-
-            for (let i = 0; i < 5; i++) {
-                bolas.push(new Bola())
-            }
-            stopGame = false
-        }
-
-
-
-        //Pedro, o que faz o MortyDevil andar 
-
-        //------------------------------------------------
     }
 
+    function nivel2() {
+        ctx.fillStyle = 'green'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.drawImage(background2, 0, 0, background2.width, background2.height, 0, 0, canvas.width, 500)
+
+        platform.show()
+        escada.show()
+
+        for (let i = 0; i < setas.length; i++) {
+            setas[i].draw()
+            setas[i].arrowRise()
+            setas[i].max()
+        }
+        devil.up(5)
+        devil.down(-5)
+        devil.grav()
+        devil.update()
+        devil.show()
+        for (let bola of bolas) {
+            bola.show()
+            bola.update()
+            bola.colide()
+        }
+    }
     //Mostrar Vidas
     function vidas() {
-        if (devil.lives > 0) ctx.drawImage(mortyHead, 20, 535, 25, 25)
-        if (devil.lives > 1) ctx.drawImage(mortyHead, 50, 535, 25, 25)
-        if (devil.lives > 2) ctx.drawImage(mortyHead, 80, 535, 25, 25)
+        if (devil.lives >= 0) ctx.drawImage(mortyHead, 20, 535, 25, 25)
+        if (devil.lives >= 1) ctx.drawImage(mortyHead, 50, 535, 25, 25)
+        if (devil.lives >= 2) {
+            ctx.drawImage(mees, 80, 535, 25, 25)
+        }
     }
 
     //O chão
